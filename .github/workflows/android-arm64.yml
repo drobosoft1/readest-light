@@ -70,6 +70,10 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
         run: pnpm tauri android init
 
+      - name: Generate Android icons
+        working-directory: ${{ env.APP_DIR }}
+        run: pnpm tauri icon ../../data/icons/readest-book.png
+
       - name: Build Android ARM64 debug APK
         working-directory: ${{ env.APP_DIR }}
         env:
