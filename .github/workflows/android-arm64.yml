@@ -1,0 +1,96 @@
+name: Android ARM64 build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  APP_DIR: apps/readest-app
+  NDK_VERSION: 28.2.13676358
+
+jobs:
+  build-android-arm64:
+    name: Build Android ARM64 APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Setup Java
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: zulu
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4
+
+      - name: Install Android SDK components
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;${NDK_VERSION}"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16 # v2
+        with:
+          workspaces: apps/readest-app/src-tauri -> target
+
+      - name: Install project dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Prepare frontend vendor assets
+        working-directory: ${{ env.APP_DIR }}
+        run: pnpm setup-vendors
+
+      - name: Build frontend
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          NEXT_PUBLIC_APP_PLATFORM: tauri
+        run: pnpm build
+
+      - name: Generate Android project
+        working-directory: ${{ env.APP_DIR }}
+        run: pnpm tauri android init
+
+      - name: Build Android ARM64 debug APK
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/${{ env.NDK_VERSION }}
+        run: pnpm tauri android build --debug -t aarch64
+
+      - name: Locate APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=$(find "${APP_DIR}/src-tauri/gen/android/app/build/outputs/apk" -type f -name '*.apk' -print -quit)
+          test -n "$apk"
+          echo "path=$apk" >> "$GITHUB_OUTPUT"
+          echo "APK: $apk"
+          du -h "$apk"
+
+      - name: Upload Android ARM64 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: readest-android-arm64-debug
+          path: ${{ steps.apk.outputs.path }}
+          if-no-files-found: error
+          retention-days: 14
