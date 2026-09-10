@@ -18,9 +18,8 @@ multiple targets:
 - a **mobile app** (Android / iOS) via Tauri v2 mobile
 - a **web app** running on Next.js / Cloudflare Workers (OpenNext) at
   [web.readest.com](https://web.readest.com)
-- two **side surfaces**: a "Send to Readest" browser extension
-  (`apps/readest-app/extension/send-to-readest`) and a Windows thumbnail
-  shell extension (`apps/readest-app/extensions/windows-thumbnail`)
+- one **side surface**: a Windows thumbnail shell extension
+  (`apps/readest-app/extensions/windows-thumbnail`)
 
 The same React UI runs in all targets. What differs is the **host shell** under
 the UI and the **set of services** that the UI binds to at runtime — see

@@ -616,43 +616,6 @@ importers:
         specifier: ^4.85.0
         version: 4.90.0(@cloudflare/workers-types@4.20260518.1)(@types/node@22.19.19)
 
-  apps/readest-app/extensions/send-to-readest:
-    dependencies:
-      '@mozilla/readability':
-        specifier: ^0.6.0
-        version: 0.6.0
-      '@zip.js/zip.js':
-        specifier: ^2.8.16
-        version: 2.8.26
-      dompurify:
-        specifier: '>=3.4.13'
-        version: 3.4.13
-    devDependencies:
-      '@types/chrome':
-        specifier: ^0.0.270
-        version: 0.0.270
-      '@types/dompurify':
-        specifier: ^3.0.5
-        version: 3.2.0
-      copy-webpack-plugin:
-        specifier: ^14.0.0
-        version: 14.0.0(webpack@5.106.2)
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      ts-loader:
-        specifier: ^9.5.1
-        version: 9.5.7(typescript@5.9.3)(webpack@5.106.2)
-      typescript:
-        specifier: ^5.6.3
-        version: 5.9.3
-      webpack:
-        specifier: ^5.97.1
-        version: 5.106.2(webpack-cli@5.1.4)
-      webpack-cli:
-        specifier: ^5.1.4
-        version: 5.1.4(webpack@5.106.2)
-
   apps/readest-app/workers/iap-reconcile:
     dependencies:
       '@supabase/supabase-js':
